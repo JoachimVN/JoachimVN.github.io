@@ -2,9 +2,9 @@
     "cleanUrls": true,
     "trailingSlash": true,
     "rewrites": [
-        { "source": "/choridor/:path*", "destination": "/projects/choridor/:path*" },
-        { "source": "/lego/:path*", "destination": "/projects/lego/:path*" },
-        { "source": "/mpi/:path*", "destination": "/projects/mpi/:path*" },
+        { "source": "/choridor/(.*)", "destination": "/projects/choridor/$1" },
+        { "source": "/lego/(.*)", "destination": "/projects/lego/$1" },
+        { "source": "/mpi/(.*)", "destination": "/projects/mpi/$1" },
         { "source": "/versed/(.*\\..*)", "destination": "/projects/versed/$1" },
         { "source": "/versed/(.*)", "destination": "/projects/versed/" },
         { "source": "/dart-scores/(.*\\..*)", "destination": "/projects/dart-scores/$1" },
