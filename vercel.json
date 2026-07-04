@@ -1,15 +1,13 @@
 {
     "cleanUrls": true,
     "trailingSlash": true,
-    "redirects": [
-        { "source": "/Versed", "destination": "/versed/" },
-        { "source": "/Versed/(.*)", "destination": "/versed/$1" },
-        { "source": "/MPI", "destination": "/mpi" },
-        { "source": "/MPI/", "destination": "/mpi" },
-        { "source": "/Mpi", "destination": "/mpi" },
-        { "source": "/Mpi/", "destination": "/mpi" }
-    ],
     "rewrites": [
-        { "source": "/versed/(.*)", "destination": "/versed/" }
+        { "source": "/choridor/:path*", "destination": "/projects/choridor/:path*" },
+        { "source": "/lego/:path*", "destination": "/projects/lego/:path*" },
+        { "source": "/mpi/:path*", "destination": "/projects/mpi/:path*" },
+        { "source": "/versed/(.*\\..*)", "destination": "/projects/versed/$1" },
+        { "source": "/versed/(.*)", "destination": "/projects/versed/" },
+        { "source": "/dart-scores/(.*\\..*)", "destination": "/projects/dart-scores/$1" },
+        { "source": "/dart-scores/(.*)", "destination": "/projects/dart-scores/" }
     ]
 }
