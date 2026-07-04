@@ -69,13 +69,60 @@
     .weights-panel .reset-btn:hover { background: #2a2a2a; color: #fff; }
     .weights-panel .apply-btn { background: #1db954; border: 1px solid #1db954; color: #0f0f0f; font-weight: 600; }
     .weights-panel .apply-btn:hover { background: #1ed760; }
+    .chart-card { background: #161616; border: 1px solid #2a2a2a; border-radius: 8px;
+                   padding: 0.9rem 1.4rem; margin-bottom: 1.5rem; }
+    .chart-card[open] { padding-bottom: 0.9rem; }
+    .chart-card summary { font-size: 0.95rem; color: #eee; font-weight: 600; cursor: pointer;
+                            padding: 0.3rem 0; list-style: none; }
+    .chart-card summary::-webkit-details-marker { display: none; }
+    .chart-card summary::before { content: "▸ "; color: #666; display: inline-block; width: 1rem; }
+    .chart-card[open] summary::before { content: "▾ "; }
+    .chart-card summary:hover { color: #fff; }
+    .chart-subtitle { color: #777; font-size: 0.78rem; margin: 0.5rem 0 0.4rem; }
+    .chart-controls { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem;
+                        font-size: 0.82rem; color: #999; }
+    .scope-dropdown { position: relative; display: inline-block; }
+    .scope-dropdown-btn { display: flex; align-items: center; gap: 0.5rem; background: #1e1e1e;
+                            border: 1px solid #333; border-radius: 5px; color: #fff; font: inherit;
+                            font-size: 0.85rem; font-weight: 600; padding: 0.35rem 0.7rem; cursor: pointer; }
+    .scope-dropdown-btn:hover { border-color: #444; }
+    .scope-dropdown-btn:focus { outline: none; border-color: #1db954; }
+    .scope-dropdown-arrow { color: #888; font-size: 0.7rem; }
+    .scope-dropdown-menu { position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%;
+                             display: flex; flex-direction: column;
+                             background: #1a1a1a; border: 1px solid #333; border-radius: 6px;
+                             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+                             margin: 0; padding: 0.3rem; z-index: 20; }
+    .scope-dropdown-menu[hidden] { display: none; }
+    .scope-option { display: block; width: 100%; background: none; border: none;
+                      text-align: left; font: inherit; padding: 0.4rem 0.7rem; font-size: 0.85rem;
+                      color: #ccc; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+    .scope-option:hover { background: #262626; color: #fff; }
+    .scope-option:focus { outline: none; background: #262626; color: #fff; }
+    .scope-option.selected { color: #1db954; }
+    .year-chart-wrap { position: relative; }
+    .year-chart { width: 100%; height: auto; display: block; overflow: visible; }
+    .year-chart .grid { stroke: #262626; stroke-width: 1; }
+    .year-chart .axis-y, .year-chart .axis-x { fill: #666; font-size: 9px; }
+    .year-chart .bar { fill: #1db954; }
+    .year-chart .bar-hit { fill: transparent; }
+    .year-chart .bar-group:hover .bar, .year-chart .bar-group:focus .bar { fill: #1ed760; }
+    .year-chart .bar-group:focus { outline: none; }
+    .year-chart .bar-peak-label { fill: #ccc; font-size: 11px; font-weight: 600; text-anchor: middle; }
+    .chart-tooltip { position: absolute; pointer-events: none; background: #0a0a0a;
+                       border: 1px solid #333; border-radius: 5px; padding: 0.35rem 0.6rem;
+                       font-size: 0.78rem; color: #eee; white-space: nowrap; opacity: 0;
+                       transform: translate(-50%, -100%); transition: opacity 0.1s; z-index: 10; }
+    .chart-tooltip.visible { opacity: 1; }
+    .chart-tooltip .tt-value { font-weight: 700; color: #fff; }
+    .chart-tooltip .tt-label { color: #999; margin-left: 0.3rem; }
   </style>
 </head>
 <body>
   <h1>Music Popularity Index</h1>
   <p class="subtitle">Top 2500 songs · Billboard Hot 100 (1958–present) · Spotify all-time streams · Era-normalized within a ±5-year window</p>
   <div class="wip-banner"><strong>Work in progress</strong>, the scoring model is still being tuned, so these rankings will change.</div>
-  <p class="updated">Last updated 02 Jul 2026 UTC</p>
+  <p class="updated">Last updated 04 Jul 2026 UTC</p>
 
   <details class="weights-panel">
     <summary>Adjust dimension weights</summary>
@@ -162,6 +209,308 @@
       <button type="button" class="apply-btn" onclick="applyWeights()">Apply</button>
       <button type="button" class="reset-btn" onclick="resetWeights()">Reset to defaults</button>
       <span class="weights-total">Total: <span class="value" id="weights-total">100</span>%</span>
+    </div>
+  </details>
+
+  <details class="chart-card">
+    <summary>Release year distribution</summary>
+    <div class="chart-controls">
+      <span>Show top</span>
+      <div class="scope-dropdown" id="year-chart-scope-dropdown">
+        <button type="button" class="scope-dropdown-btn" id="year-chart-scope-btn"
+                aria-haspopup="true" aria-expanded="false" onclick="toggleScopeDropdown()">
+          <span id="year-chart-scope-label">All (2500)</span>
+          <span class="scope-dropdown-arrow">▾</span>
+        </button>
+        <div class="scope-dropdown-menu" id="year-chart-scope-menu" hidden><button type="button" class="scope-option" data-value="100" aria-current="false" onclick="selectScope(100, '100')">100</button><button type="button" class="scope-option" data-value="500" aria-current="false" onclick="selectScope(500, '500')">500</button><button type="button" class="scope-option" data-value="1000" aria-current="false" onclick="selectScope(1000, '1000')">1000</button><button type="button" class="scope-option selected" data-value="2500" aria-current="true" onclick="selectScope(2500, 'All (2500)')">All (2500)</button></div>
+      </div>
+      <span>songs by current weights</span>
+    </div>
+    <p class="chart-subtitle" id="year-chart-subtitle">2500 songs in the top 2500 by release year · 23 songs missing a release year and excluded</p>
+    <div class="year-chart-wrap">
+      <svg class="year-chart" viewBox="0 0 1000 240" role="img"
+           aria-label="Number of songs by release year, 1958–2026, peaking at 88 in 2018">
+        <line class="grid" x1="34" y1="214.00" x2="992" y2="214.00"/><text class="axis-y" x="28" y="214.00" text-anchor="end" dominant-baseline="middle">0</text><line class="grid" x1="34" y1="164.50" x2="992" y2="164.50"/><text class="axis-y" x="28" y="164.50" text-anchor="end" dominant-baseline="middle">25</text><line class="grid" x1="34" y1="115.00" x2="992" y2="115.00"/><text class="axis-y" x="28" y="115.00" text-anchor="end" dominant-baseline="middle">50</text><line class="grid" x1="34" y1="65.50" x2="992" y2="65.50"/><text class="axis-y" x="28" y="65.50" text-anchor="end" dominant-baseline="middle">75</text><line class="grid" x1="34" y1="16.00" x2="992" y2="16.00"/><text class="axis-y" x="28" y="16.00" text-anchor="end" dominant-baseline="middle">100</text>
+        
+          <g class="bar-group" tabindex="0" data-year="1958" data-count="4">
+            <rect class="bar-hit" x="34.00" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M34.00,214.00 L34.00,210.04 Q34.00,206.08 37.96,206.08 L41.92,206.08 Q45.88,206.08 45.88,210.04 L45.88,214.00 Z"/>
+          </g><text class="axis-x" x="39.94" y="230" text-anchor="middle">1958</text>
+          <g class="bar-group" tabindex="0" data-year="1959" data-count="2">
+            <rect class="bar-hit" x="47.88" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M47.88,214.00 L47.88,212.02 Q47.88,210.04 49.86,210.04 L57.79,210.04 Q59.77,210.04 59.77,212.02 L59.77,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1960" data-count="5">
+            <rect class="bar-hit" x="61.77" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M61.77,214.00 L61.77,208.10 Q61.77,204.10 65.77,204.10 L69.65,204.10 Q73.65,204.10 73.65,208.10 L73.65,214.00 Z"/>
+          </g><text class="axis-x" x="67.71" y="230" text-anchor="middle">1960</text>
+          <g class="bar-group" tabindex="0" data-year="1961" data-count="4">
+            <rect class="bar-hit" x="75.65" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M75.65,214.00 L75.65,210.04 Q75.65,206.08 79.61,206.08 L83.58,206.08 Q87.54,206.08 87.54,210.04 L87.54,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1962" data-count="3">
+            <rect class="bar-hit" x="89.54" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M89.54,214.00 L89.54,211.03 Q89.54,208.06 92.51,208.06 L98.45,208.06 Q101.42,208.06 101.42,211.03 L101.42,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1963" data-count="4">
+            <rect class="bar-hit" x="103.42" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M103.42,214.00 L103.42,210.04 Q103.42,206.08 107.38,206.08 L111.34,206.08 Q115.30,206.08 115.30,210.04 L115.30,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1964" data-count="14">
+            <rect class="bar-hit" x="117.30" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M117.30,214.00 L117.30,190.28 Q117.30,186.28 121.30,186.28 L125.19,186.28 Q129.19,186.28 129.19,190.28 L129.19,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1965" data-count="14">
+            <rect class="bar-hit" x="131.19" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M131.19,214.00 L131.19,190.28 Q131.19,186.28 135.19,186.28 L139.07,186.28 Q143.07,186.28 143.07,190.28 L143.07,214.00 Z"/>
+          </g><text class="axis-x" x="137.13" y="230" text-anchor="middle">1965</text>
+          <g class="bar-group" tabindex="0" data-year="1966" data-count="15">
+            <rect class="bar-hit" x="145.07" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M145.07,214.00 L145.07,188.30 Q145.07,184.30 149.07,184.30 L152.96,184.30 Q156.96,184.30 156.96,188.30 L156.96,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1967" data-count="21">
+            <rect class="bar-hit" x="158.96" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M158.96,214.00 L158.96,176.42 Q158.96,172.42 162.96,172.42 L166.84,172.42 Q170.84,172.42 170.84,176.42 L170.84,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1968" data-count="16">
+            <rect class="bar-hit" x="172.84" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M172.84,214.00 L172.84,186.32 Q172.84,182.32 176.84,182.32 L180.72,182.32 Q184.72,182.32 184.72,186.32 L184.72,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1969" data-count="21">
+            <rect class="bar-hit" x="186.72" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M186.72,214.00 L186.72,176.42 Q186.72,172.42 190.72,172.42 L194.61,172.42 Q198.61,172.42 198.61,176.42 L198.61,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1970" data-count="15">
+            <rect class="bar-hit" x="200.61" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M200.61,214.00 L200.61,188.30 Q200.61,184.30 204.61,184.30 L208.49,184.30 Q212.49,184.30 212.49,188.30 L212.49,214.00 Z"/>
+          </g><text class="axis-x" x="206.55" y="230" text-anchor="middle">1970</text>
+          <g class="bar-group" tabindex="0" data-year="1971" data-count="18">
+            <rect class="bar-hit" x="214.49" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M214.49,214.00 L214.49,182.36 Q214.49,178.36 218.49,178.36 L222.38,178.36 Q226.38,178.36 226.38,182.36 L226.38,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1972" data-count="25">
+            <rect class="bar-hit" x="228.38" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M228.38,214.00 L228.38,168.50 Q228.38,164.50 232.38,164.50 L236.26,164.50 Q240.26,164.50 240.26,168.50 L240.26,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1973" data-count="22">
+            <rect class="bar-hit" x="242.26" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M242.26,214.00 L242.26,174.44 Q242.26,170.44 246.26,170.44 L250.14,170.44 Q254.14,170.44 254.14,174.44 L254.14,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1974" data-count="24">
+            <rect class="bar-hit" x="256.14" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M256.14,214.00 L256.14,170.48 Q256.14,166.48 260.14,166.48 L264.03,166.48 Q268.03,166.48 268.03,170.48 L268.03,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1975" data-count="20">
+            <rect class="bar-hit" x="270.03" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M270.03,214.00 L270.03,178.40 Q270.03,174.40 274.03,174.40 L277.91,174.40 Q281.91,174.40 281.91,178.40 L281.91,214.00 Z"/>
+          </g><text class="axis-x" x="275.97" y="230" text-anchor="middle">1975</text>
+          <g class="bar-group" tabindex="0" data-year="1976" data-count="36">
+            <rect class="bar-hit" x="283.91" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M283.91,214.00 L283.91,146.72 Q283.91,142.72 287.91,142.72 L291.80,142.72 Q295.80,142.72 295.80,146.72 L295.80,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1977" data-count="29">
+            <rect class="bar-hit" x="297.80" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M297.80,214.00 L297.80,160.58 Q297.80,156.58 301.80,156.58 L305.68,156.58 Q309.68,156.58 309.68,160.58 L309.68,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1978" data-count="39">
+            <rect class="bar-hit" x="311.68" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M311.68,214.00 L311.68,140.78 Q311.68,136.78 315.68,136.78 L319.57,136.78 Q323.57,136.78 323.57,140.78 L323.57,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1979" data-count="36">
+            <rect class="bar-hit" x="325.57" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M325.57,214.00 L325.57,146.72 Q325.57,142.72 329.57,142.72 L333.45,142.72 Q337.45,142.72 337.45,146.72 L337.45,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1980" data-count="29">
+            <rect class="bar-hit" x="339.45" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M339.45,214.00 L339.45,160.58 Q339.45,156.58 343.45,156.58 L347.33,156.58 Q351.33,156.58 351.33,160.58 L351.33,214.00 Z"/>
+          </g><text class="axis-x" x="345.39" y="230" text-anchor="middle">1980</text>
+          <g class="bar-group" tabindex="0" data-year="1981" data-count="19">
+            <rect class="bar-hit" x="353.33" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M353.33,214.00 L353.33,180.38 Q353.33,176.38 357.33,176.38 L361.22,176.38 Q365.22,176.38 365.22,180.38 L365.22,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1982" data-count="18">
+            <rect class="bar-hit" x="367.22" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M367.22,214.00 L367.22,182.36 Q367.22,178.36 371.22,178.36 L375.10,178.36 Q379.10,178.36 379.10,182.36 L379.10,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1983" data-count="27">
+            <rect class="bar-hit" x="381.10" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M381.10,214.00 L381.10,164.54 Q381.10,160.54 385.10,160.54 L388.99,160.54 Q392.99,160.54 392.99,164.54 L392.99,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1984" data-count="28">
+            <rect class="bar-hit" x="394.99" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M394.99,214.00 L394.99,162.56 Q394.99,158.56 398.99,158.56 L402.87,158.56 Q406.87,158.56 406.87,162.56 L406.87,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1985" data-count="27">
+            <rect class="bar-hit" x="408.87" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M408.87,214.00 L408.87,164.54 Q408.87,160.54 412.87,160.54 L416.75,160.54 Q420.75,160.54 420.75,164.54 L420.75,214.00 Z"/>
+          </g><text class="axis-x" x="414.81" y="230" text-anchor="middle">1985</text>
+          <g class="bar-group" tabindex="0" data-year="1986" data-count="15">
+            <rect class="bar-hit" x="422.75" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M422.75,214.00 L422.75,188.30 Q422.75,184.30 426.75,184.30 L430.64,184.30 Q434.64,184.30 434.64,188.30 L434.64,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1987" data-count="25">
+            <rect class="bar-hit" x="436.64" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M436.64,214.00 L436.64,168.50 Q436.64,164.50 440.64,164.50 L444.52,164.50 Q448.52,164.50 448.52,168.50 L448.52,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1988" data-count="12">
+            <rect class="bar-hit" x="450.52" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M450.52,214.00 L450.52,194.24 Q450.52,190.24 454.52,190.24 L458.41,190.24 Q462.41,190.24 462.41,194.24 L462.41,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1989" data-count="30">
+            <rect class="bar-hit" x="464.41" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M464.41,214.00 L464.41,158.60 Q464.41,154.60 468.41,154.60 L472.29,154.60 Q476.29,154.60 476.29,158.60 L476.29,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1990" data-count="25">
+            <rect class="bar-hit" x="478.29" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M478.29,214.00 L478.29,168.50 Q478.29,164.50 482.29,164.50 L486.17,164.50 Q490.17,164.50 490.17,168.50 L490.17,214.00 Z"/>
+          </g><text class="axis-x" x="484.23" y="230" text-anchor="middle">1990</text>
+          <g class="bar-group" tabindex="0" data-year="1991" data-count="18">
+            <rect class="bar-hit" x="492.17" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M492.17,214.00 L492.17,182.36 Q492.17,178.36 496.17,178.36 L500.06,178.36 Q504.06,178.36 504.06,182.36 L504.06,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1992" data-count="26">
+            <rect class="bar-hit" x="506.06" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M506.06,214.00 L506.06,166.52 Q506.06,162.52 510.06,162.52 L513.94,162.52 Q517.94,162.52 517.94,166.52 L517.94,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1993" data-count="43">
+            <rect class="bar-hit" x="519.94" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M519.94,214.00 L519.94,132.86 Q519.94,128.86 523.94,128.86 L527.83,128.86 Q531.83,128.86 531.83,132.86 L531.83,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1994" data-count="27">
+            <rect class="bar-hit" x="533.83" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M533.83,214.00 L533.83,164.54 Q533.83,160.54 537.83,160.54 L541.71,160.54 Q545.71,160.54 545.71,164.54 L545.71,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1995" data-count="25">
+            <rect class="bar-hit" x="547.71" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M547.71,214.00 L547.71,168.50 Q547.71,164.50 551.71,164.50 L555.59,164.50 Q559.59,164.50 559.59,168.50 L559.59,214.00 Z"/>
+          </g><text class="axis-x" x="553.65" y="230" text-anchor="middle">1995</text>
+          <g class="bar-group" tabindex="0" data-year="1996" data-count="21">
+            <rect class="bar-hit" x="561.59" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M561.59,214.00 L561.59,176.42 Q561.59,172.42 565.59,172.42 L569.48,172.42 Q573.48,172.42 573.48,176.42 L573.48,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1997" data-count="32">
+            <rect class="bar-hit" x="575.48" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M575.48,214.00 L575.48,154.64 Q575.48,150.64 579.48,150.64 L583.36,150.64 Q587.36,150.64 587.36,154.64 L587.36,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1998" data-count="33">
+            <rect class="bar-hit" x="589.36" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M589.36,214.00 L589.36,152.66 Q589.36,148.66 593.36,148.66 L597.25,148.66 Q601.25,148.66 601.25,152.66 L601.25,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="1999" data-count="42">
+            <rect class="bar-hit" x="603.25" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M603.25,214.00 L603.25,134.84 Q603.25,130.84 607.25,130.84 L611.13,130.84 Q615.13,130.84 615.13,134.84 L615.13,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2000" data-count="34">
+            <rect class="bar-hit" x="617.13" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M617.13,214.00 L617.13,150.68 Q617.13,146.68 621.13,146.68 L625.01,146.68 Q629.01,146.68 629.01,150.68 L629.01,214.00 Z"/>
+          </g><text class="axis-x" x="623.07" y="230" text-anchor="middle">2000</text>
+          <g class="bar-group" tabindex="0" data-year="2001" data-count="26">
+            <rect class="bar-hit" x="631.01" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M631.01,214.00 L631.01,166.52 Q631.01,162.52 635.01,162.52 L638.90,162.52 Q642.90,162.52 642.90,166.52 L642.90,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2002" data-count="32">
+            <rect class="bar-hit" x="644.90" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M644.90,214.00 L644.90,154.64 Q644.90,150.64 648.90,150.64 L652.78,150.64 Q656.78,150.64 656.78,154.64 L656.78,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2003" data-count="41">
+            <rect class="bar-hit" x="658.78" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M658.78,214.00 L658.78,136.82 Q658.78,132.82 662.78,132.82 L666.67,132.82 Q670.67,132.82 670.67,136.82 L670.67,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2004" data-count="48">
+            <rect class="bar-hit" x="672.67" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M672.67,214.00 L672.67,122.96 Q672.67,118.96 676.67,118.96 L680.55,118.96 Q684.55,118.96 684.55,122.96 L684.55,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2005" data-count="62">
+            <rect class="bar-hit" x="686.55" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M686.55,214.00 L686.55,95.24 Q686.55,91.24 690.55,91.24 L694.43,91.24 Q698.43,91.24 698.43,95.24 L698.43,214.00 Z"/>
+          </g><text class="axis-x" x="692.49" y="230" text-anchor="middle">2005</text>
+          <g class="bar-group" tabindex="0" data-year="2006" data-count="65">
+            <rect class="bar-hit" x="700.43" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M700.43,214.00 L700.43,89.30 Q700.43,85.30 704.43,85.30 L708.32,85.30 Q712.32,85.30 712.32,89.30 L712.32,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2007" data-count="78">
+            <rect class="bar-hit" x="714.32" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M714.32,214.00 L714.32,63.56 Q714.32,59.56 718.32,59.56 L722.20,59.56 Q726.20,59.56 726.20,63.56 L726.20,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2008" data-count="69">
+            <rect class="bar-hit" x="728.20" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M728.20,214.00 L728.20,81.38 Q728.20,77.38 732.20,77.38 L736.09,77.38 Q740.09,77.38 740.09,81.38 L740.09,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2009" data-count="66">
+            <rect class="bar-hit" x="742.09" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M742.09,214.00 L742.09,87.32 Q742.09,83.32 746.09,83.32 L749.97,83.32 Q753.97,83.32 753.97,87.32 L753.97,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2010" data-count="57">
+            <rect class="bar-hit" x="755.97" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M755.97,214.00 L755.97,105.14 Q755.97,101.14 759.97,101.14 L763.86,101.14 Q767.86,101.14 767.86,105.14 L767.86,214.00 Z"/>
+          </g><text class="axis-x" x="761.91" y="230" text-anchor="middle">2010</text>
+          <g class="bar-group" tabindex="0" data-year="2011" data-count="68">
+            <rect class="bar-hit" x="769.86" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M769.86,214.00 L769.86,83.36 Q769.86,79.36 773.86,79.36 L777.74,79.36 Q781.74,79.36 781.74,83.36 L781.74,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2012" data-count="56">
+            <rect class="bar-hit" x="783.74" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M783.74,214.00 L783.74,107.12 Q783.74,103.12 787.74,103.12 L791.62,103.12 Q795.62,103.12 795.62,107.12 L795.62,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2013" data-count="65">
+            <rect class="bar-hit" x="797.62" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M797.62,214.00 L797.62,89.30 Q797.62,85.30 801.62,85.30 L805.51,85.30 Q809.51,85.30 809.51,89.30 L809.51,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2014" data-count="70">
+            <rect class="bar-hit" x="811.51" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M811.51,214.00 L811.51,79.40 Q811.51,75.40 815.51,75.40 L819.39,75.40 Q823.39,75.40 823.39,79.40 L823.39,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2015" data-count="70">
+            <rect class="bar-hit" x="825.39" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M825.39,214.00 L825.39,79.40 Q825.39,75.40 829.39,75.40 L833.28,75.40 Q837.28,75.40 837.28,79.40 L837.28,214.00 Z"/>
+          </g><text class="axis-x" x="831.33" y="230" text-anchor="middle">2015</text>
+          <g class="bar-group" tabindex="0" data-year="2016" data-count="83">
+            <rect class="bar-hit" x="839.28" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M839.28,214.00 L839.28,53.66 Q839.28,49.66 843.28,49.66 L847.16,49.66 Q851.16,49.66 851.16,53.66 L851.16,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2017" data-count="82">
+            <rect class="bar-hit" x="853.16" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M853.16,214.00 L853.16,55.64 Q853.16,51.64 857.16,51.64 L861.04,51.64 Q865.04,51.64 865.04,55.64 L865.04,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2018" data-count="88">
+            <rect class="bar-hit" x="867.04" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar bar-peak" d="M867.04,214.00 L867.04,43.76 Q867.04,39.76 871.04,39.76 L874.93,39.76 Q878.93,39.76 878.93,43.76 L878.93,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2019" data-count="73">
+            <rect class="bar-hit" x="880.93" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M880.93,214.00 L880.93,73.46 Q880.93,69.46 884.93,69.46 L888.81,69.46 Q892.81,69.46 892.81,73.46 L892.81,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2020" data-count="75">
+            <rect class="bar-hit" x="894.81" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M894.81,214.00 L894.81,69.50 Q894.81,65.50 898.81,65.50 L902.70,65.50 Q906.70,65.50 906.70,69.50 L906.70,214.00 Z"/>
+          </g><text class="axis-x" x="900.75" y="230" text-anchor="middle">2020</text>
+          <g class="bar-group" tabindex="0" data-year="2021" data-count="67">
+            <rect class="bar-hit" x="908.70" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M908.70,214.00 L908.70,85.34 Q908.70,81.34 912.70,81.34 L916.58,81.34 Q920.58,81.34 920.58,85.34 L920.58,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2022" data-count="62">
+            <rect class="bar-hit" x="922.58" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M922.58,214.00 L922.58,95.24 Q922.58,91.24 926.58,91.24 L930.46,91.24 Q934.46,91.24 934.46,95.24 L934.46,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2023" data-count="48">
+            <rect class="bar-hit" x="936.46" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M936.46,214.00 L936.46,122.96 Q936.46,118.96 940.46,118.96 L944.35,118.96 Q948.35,118.96 948.35,122.96 L948.35,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2024" data-count="49">
+            <rect class="bar-hit" x="950.35" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M950.35,214.00 L950.35,120.98 Q950.35,116.98 954.35,116.98 L958.23,116.98 Q962.23,116.98 962.23,120.98 L962.23,214.00 Z"/>
+          </g>
+          <g class="bar-group" tabindex="0" data-year="2025" data-count="31">
+            <rect class="bar-hit" x="964.23" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M964.23,214.00 L964.23,156.62 Q964.23,152.62 968.23,152.62 L972.12,152.62 Q976.12,152.62 976.12,156.62 L976.12,214.00 Z"/>
+          </g><text class="axis-x" x="970.17" y="230" text-anchor="middle">2025</text>
+          <g class="bar-group" tabindex="0" data-year="2026" data-count="3">
+            <rect class="bar-hit" x="978.12" y="16.00" width="11.88" height="198.00"/>
+            <path class="bar" d="M978.12,214.00 L978.12,211.03 Q978.12,208.06 981.09,208.06 L987.03,208.06 Q990.00,208.06 990.00,211.03 L990.00,214.00 Z"/>
+          </g>
+        <text class="bar-peak-label" x="872.99" y="31.76" text-anchor="middle">88</text>
+      </svg>
+      <div class="chart-tooltip" id="year-tooltip" role="tooltip"></div>
     </div>
   </details>
 
@@ -45237,6 +45586,7 @@
     function applyWeights() {
       updateTotal();
       recomputeAndRerank();
+      updateYearChart();
     }
 
     function resetWeights() {
@@ -45297,6 +45647,227 @@
     document.querySelectorAll("#table thead .sort-btn").forEach((btn, i) => {
       btn.addEventListener("click", () => sortBy(i));
     });
+
+    // Year-histogram hover/focus tooltip. Same info is already in the SVG's
+    // aria-label and each bar's data-year/data-count, so the tooltip only
+    // ever repeats what's already reachable without a pointer.
+    const yearTooltip = document.getElementById("year-tooltip");
+    const yearChartWrap = document.querySelector(".year-chart-wrap");
+    function showYearTooltip(group) {
+      const { year, count } = group.dataset;
+      yearTooltip.innerHTML = "";
+      const value = document.createElement("span");
+      value.className = "tt-value";
+      value.textContent = count;
+      const label = document.createElement("span");
+      label.className = "tt-label";
+      label.textContent = count === "1" ? `song in ${year}` : `songs in ${year}`;
+      yearTooltip.appendChild(value);
+      yearTooltip.appendChild(label);
+      const wrapRect = yearChartWrap.getBoundingClientRect();
+      const hitRect = group.querySelector(".bar-hit").getBoundingClientRect();
+      yearTooltip.style.left = `${hitRect.left - wrapRect.left + hitRect.width / 2}px`;
+      yearTooltip.style.top = `${hitRect.top - wrapRect.top - 6}px`;
+      yearTooltip.classList.add("visible");
+    }
+    function hideYearTooltip() {
+      yearTooltip.classList.remove("visible");
+    }
+    function attachYearTooltipHandlers() {
+      document.querySelectorAll(".year-chart .bar-group").forEach(group => {
+        group.addEventListener("pointerenter", () => showYearTooltip(group));
+        group.addEventListener("pointerleave", hideYearTooltip);
+        group.addEventListener("focus", () => showYearTooltip(group));
+        group.addEventListener("blur", hideYearTooltip);
+      });
+    }
+
+    // A native <select>'s open dropdown list can't be themed to match the
+    // page (it renders in OS chrome), so the scope picker is a plain button
+    // + absolutely-positioned menu built from ordinary elements instead.
+    let yearChartScope = 2500;
+    function toggleScopeDropdown() {
+      const menu = document.getElementById("year-chart-scope-menu");
+      const btn = document.getElementById("year-chart-scope-btn");
+      const opening = menu.hidden;
+      menu.hidden = !opening;
+      btn.setAttribute("aria-expanded", String(opening));
+    }
+    function closeScopeDropdown() {
+      document.getElementById("year-chart-scope-menu").hidden = true;
+      document.getElementById("year-chart-scope-btn").setAttribute("aria-expanded", "false");
+    }
+    function selectScope(value, label) {
+      yearChartScope = value;
+      document.getElementById("year-chart-scope-label").textContent = label;
+      document.querySelectorAll("#year-chart-scope-menu .scope-option").forEach(btn => {
+        const isSelected = Number(btn.dataset.value) === value;
+        btn.classList.toggle("selected", isSelected);
+        btn.setAttribute("aria-current", String(isSelected));
+      });
+      closeScopeDropdown();
+      updateYearChart();
+    }
+    document.addEventListener("click", e => {
+      const dropdown = document.getElementById("year-chart-scope-dropdown");
+      if (dropdown && !dropdown.contains(e.target)) closeScopeDropdown();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeScopeDropdown();
+    });
+
+    // Mirrors _bar_path()/_nice_step()/_year_chart_html() in export.py's Python
+    // (used only for the pre-JS initial render) — kept in sync by hand, same
+    // as computeScore() above. This JS copy is what actually redraws the chart
+    // whenever weights or the top-N scope change, since it needs the live,
+    // in-browser recomputed scores rather than the server's original ranking.
+    const YEAR_MIN = 1958;
+    const YEAR_MAX = 2026;
+    const YEAR_VIEW_W = 1000, YEAR_VIEW_H = 240;
+    const YEAR_MARGIN = { left: 34, right: 8, top: 16, bottom: 26 };
+
+    function yearNiceStep(maxVal, targetLines = 4) {
+      for (const step of [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000]) {
+        if (maxVal / step <= targetLines) return step;
+      }
+      return 5000;
+    }
+
+    function yearBarPath(x, y, w, h) {
+      const r = Math.min(4, h / 2, w / 2);
+      return `M${x.toFixed(2)},${(y + h).toFixed(2)} L${x.toFixed(2)},${(y + r).toFixed(2)} ` +
+             `Q${x.toFixed(2)},${y.toFixed(2)} ${(x + r).toFixed(2)},${y.toFixed(2)} ` +
+             `L${(x + w - r).toFixed(2)},${y.toFixed(2)} ` +
+             `Q${(x + w).toFixed(2)},${y.toFixed(2)} ${(x + w).toFixed(2)},${(y + r).toFixed(2)} ` +
+             `L${(x + w).toFixed(2)},${(y + h).toFixed(2)} Z`;
+    }
+
+    function yearFindPeak(counts) {
+      let peakYear = null, peakCount = 0;
+      for (const [yr, c] of counts) {
+        if (c > peakCount) { peakCount = c; peakYear = yr; }
+      }
+      return { peakYear, peakCount };
+    }
+
+    // Every 5th year gets an axis label, plus the first/last year — unless an
+    // edge year sits too close to its neighboring mod-5 label to avoid overlap.
+    function yearLabelSet(allYears, slotW) {
+      const minGapYears = Math.max(2, Math.ceil(20 / slotW));
+      const labelYears = new Set(allYears.filter(y => y % 5 === 0));
+      for (const edge of [allYears[0], allYears[allYears.length - 1]]) {
+        const tooClose = [...labelYears].some(ly => Math.abs(edge - ly) < minGapYears);
+        if (!tooClose) labelYears.add(edge);
+      }
+      return labelYears;
+    }
+
+    function yearGridlinesSvg(plotH, yMax, step) {
+      let svg = "";
+      for (let i = 0; i <= yMax / step; i++) {
+        const val = i * step;
+        const gy = YEAR_MARGIN.top + plotH * (1 - val / yMax);
+        svg += `<line class="grid" x1="${YEAR_MARGIN.left}" y1="${gy.toFixed(2)}" x2="${YEAR_VIEW_W - YEAR_MARGIN.right}" y2="${gy.toFixed(2)}"/>`;
+        svg += `<text class="axis-y" x="${YEAR_MARGIN.left - 6}" y="${gy.toFixed(2)}" text-anchor="end" dominant-baseline="middle">${val}</text>`;
+      }
+      return svg;
+    }
+
+    // Returns this bar's markup plus its geometry, so the caller can track
+    // the peak bar's position for the direct label without recomputing it.
+    // `layout` bundles this render's shared, per-call-invariant values (counts,
+    // peakYear, slotW, plotH, yMax, labelYears) to stay under the parameter-count limit.
+    function yearBarSvg(yr, i, layout) {
+      const { counts, peakYear, slotW, plotH, yMax, labelYears } = layout;
+      const count = counts.get(yr) || 0;
+      const x = YEAR_MARGIN.left + i * slotW;
+      const barW = Math.max(slotW - 2, 1);
+      const h = yMax ? plotH * (count / yMax) : 0;
+      const y = YEAR_MARGIN.top + plotH - h;
+      const isPeak = yr === peakYear && count > 0;
+      let svg = `<g class="bar-group" tabindex="0" data-year="${yr}" data-count="${count}">` +
+                `<rect class="bar-hit" x="${x.toFixed(2)}" y="${YEAR_MARGIN.top.toFixed(2)}" width="${barW.toFixed(2)}" height="${plotH.toFixed(2)}"/>` +
+                `<path class="bar${isPeak ? ' bar-peak' : ''}" d="${yearBarPath(x, y, barW, h)}"/>` +
+                `</g>`;
+      if (labelYears.has(yr)) {
+        const lx = x + barW / 2;
+        svg += `<text class="axis-x" x="${lx.toFixed(2)}" y="${YEAR_VIEW_H - YEAR_MARGIN.bottom + 16}" text-anchor="middle">${yr}</text>`;
+      }
+      return { svg, x, barW, y, isPeak };
+    }
+
+    // counts: Map<year, count> — only years actually present in the current subset.
+    function renderYearChart(counts) {
+      const svgEl = document.querySelector(".year-chart");
+      if (!svgEl || YEAR_MIN == null) return;
+
+      const { peakYear, peakCount } = yearFindPeak(counts);
+      const allYears = [];
+      for (let y = YEAR_MIN; y <= YEAR_MAX; y++) allYears.push(y);
+      const plotW = YEAR_VIEW_W - YEAR_MARGIN.left - YEAR_MARGIN.right;
+      const plotH = YEAR_VIEW_H - YEAR_MARGIN.top - YEAR_MARGIN.bottom;
+      const slotW = plotW / allYears.length;
+      const step = yearNiceStep(Math.max(peakCount, 1));
+      const yMax = peakCount > 0 ? Math.ceil(peakCount / step) * step : step;
+      const labelYears = yearLabelSet(allYears, slotW);
+
+      let svg = yearGridlinesSvg(plotH, yMax, step);
+      const barLayout = { counts, peakYear, slotW, plotH, yMax, labelYears };
+      let peakX = 0, peakBarY = YEAR_MARGIN.top;
+      allYears.forEach((yr, i) => {
+        const bar = yearBarSvg(yr, i, barLayout);
+        svg += bar.svg;
+        if (bar.isPeak) { peakX = bar.x + bar.barW / 2; peakBarY = bar.y; }
+      });
+      if (peakCount > 0) {
+        svg += `<text class="bar-peak-label" x="${peakX.toFixed(2)}" y="${Math.max(peakBarY - 8, 10).toFixed(2)}" text-anchor="middle">${peakCount}</text>`;
+      }
+
+      svgEl.setAttribute(
+        "aria-label",
+        `Number of songs by release year, ${YEAR_MIN}–${YEAR_MAX}, peaking at ${peakCount} in ${peakYear}`
+      );
+      svgEl.innerHTML = svg;
+      attachYearTooltipHandlers();
+    }
+
+    // Recomputes each song's score under the current weights, takes the top-N
+    // per the scope dropdown, and redraws the histogram over just that subset —
+    // this is what makes the chart shift as weights shift, since the same
+    // 2500-song pool re-ranks differently but only a re-ranked *slice* of it
+    // changes composition (see the scope control's hint text).
+    function updateYearChart() {
+      if (YEAR_MIN == null) return;
+      const scope = yearChartScope;
+      const weights = currentWeights();
+      const tbody = document.getElementById("table").tBodies[0];
+      const rows = Array.from(tbody.rows);
+
+      const scored = rows.map(row => {
+        const dims = JSON.parse(row.dataset.dims);
+        return { year: dims.year, score: computeScore(dims, weights) };
+      });
+      scored.sort((a, b) => b.score - a.score);
+      const top = scope >= scored.length ? scored : scored.slice(0, scope);
+
+      const counts = new Map();
+      let missing = 0;
+      for (const s of top) {
+        if (s.year == null) { missing++; continue; }
+        counts.set(s.year, (counts.get(s.year) || 0) + 1);
+      }
+      const included = top.length - missing;
+
+      const subtitle = document.getElementById("year-chart-subtitle");
+      const scopeLabel = Math.min(scope, scored.length);
+      let text = `${included} songs in top ${scopeLabel} by current weights, by release year`;
+      if (missing) text += ` · ${missing} missing a release year and excluded`;
+      subtitle.textContent = text;
+
+      renderYearChart(counts);
+    }
+
+    attachYearTooltipHandlers();
   </script>
 </body>
 </html>
