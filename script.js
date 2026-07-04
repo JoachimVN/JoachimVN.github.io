@@ -36,6 +36,15 @@ const PROJECTS = [
         positions:      ['center', 'center', 'right center'],
       },
     ],
+
+  {
+    github: 'JoachimVN/Music-Popularity-Index',
+    screenshotsDir: 'docs/screenshots',
+    postions: ['center'],
+    logo: 'resources/images/logos/MPI.png',
+    playUrl: '/mpi',
+
+    
   },
   {
     name:        'LEGO MINDSTORMS EV3',
