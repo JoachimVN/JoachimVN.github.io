@@ -288,6 +288,9 @@ a { text-decoration: none; }
 .about-skills.skills-visible .skill:nth-child(7) { animation-delay: 0.53s; }
 .about-skills.skills-visible .skill:nth-child(8) { animation-delay: 0.61s; }
 .about-skills.skills-visible .skill:nth-child(9) { animation-delay: 0.69s; }
+.about-skills.skills-visible .skill:nth-child(10) { animation-delay: 0.77s; }
+.about-skills.skills-visible .skill:nth-child(11) { animation-delay: 0.85s; }
+.about-skills.skills-visible .skill:nth-child(12) { animation-delay: 0.93s; }
 
 .skill:hover {
   border-color: rgba(201, 149, 42, 0.5);
