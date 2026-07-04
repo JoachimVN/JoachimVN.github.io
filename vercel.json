@@ -5,7 +5,9 @@
         { "source": "/Versed", "destination": "/versed/" },
         { "source": "/Versed/(.*)", "destination": "/versed/$1" },
         { "source": "/MPI", "destination": "/mpi" },
-        { "source": "/Mpi", "destination": "/mpi" }
+        { "source": "/MPI/", "destination": "/mpi" },
+        { "source": "/Mpi", "destination": "/mpi" },
+        { "source": "/Mpi/", "destination": "/mpi" }
     ],
     "rewrites": [
         { "source": "/versed/(.*)", "destination": "/versed/" }
