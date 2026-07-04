@@ -41,7 +41,7 @@ const PROJECTS = [
   {
     github: 'JoachimVN/Music-Popularity-Index',
     screenshotsDir: 'docs/screenshots',
-    postions: ['center'],
+    positions: ['left center', 'left center'],
     logo: 'resources/images/logos/MPI.png',
     playUrl: '/mpi',
     playText: 'View',
