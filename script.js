@@ -36,6 +36,7 @@ const PROJECTS = [
         positions:      ['center', 'center', 'right center'],
       },
     ],
+  },
 
   {
     github: 'JoachimVN/Music-Popularity-Index',
@@ -43,6 +44,9 @@ const PROJECTS = [
     postions: ['center'],
     logo: 'resources/images/logos/MPI.png',
     playUrl: '/mpi',
+    playText: 'View',
+    brandColor: '#21b151',
+
 
     
   },
@@ -187,7 +191,7 @@ function renderVariantCard({ variants, logo, logoLarge, brandColor }, index = 0)
   return `<div class="card" style="${delay}" ${data}>${inner}</div>`;
 }
 
-function renderCard({ name, description, language, stars, url, pageUrl, playUrl, screenshots = [], positions, logo, logoLarge, logoReveal, isProduct, brandColor, isVariant, variants }, index = 0) {
+function renderCard({ name, description, language, stars, url, pageUrl, playUrl, playText, screenshots = [], positions, logo, logoLarge, logoReveal, isProduct, brandColor, isVariant, variants }, index = 0) {
   if (isVariant) return renderVariantCard({ variants, logo, logoLarge, brandColor }, index);
   const color    = LANG_COLORS[language] || '#888';
   const mainShot = screenshots[0];
@@ -203,7 +207,7 @@ function renderCard({ name, description, language, stars, url, pageUrl, playUrl,
     ctaLabel = `<span class="card-link">View project ↗</span>`;
   }
   const playLabel = playUrl
-    ? `<span class="card-play-btn" onclick="event.preventDefault();event.stopPropagation();window.open('${playUrl}','_blank')"><span>▶ Play</span></span>`
+    ? `<span class="card-play-btn" onclick="event.preventDefault();event.stopPropagation();window.open('${playUrl}','_blank')"><span>▶ ${playText || 'Play'}</span></span>`
     : '';
 
   const inner = `
