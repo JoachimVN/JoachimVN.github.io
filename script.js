@@ -43,6 +43,8 @@ const PROJECTS = [
     logo: 'resources/images/logos/Dart-Scores.png',
     playUrl: '/dart-scores',
     playText: 'View',
+    screenshotsDir: 'docs/screenshots',
+    positions: ['center', 'right', 'top center'],
     brandColor: { duo: ['#2e7d32', '#c62828'] },
   },
 
