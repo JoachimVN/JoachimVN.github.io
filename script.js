@@ -19,7 +19,7 @@ const PROJECTS = [
     isVariant:  true,
     logo:       'resources/images/logos/CHORIDOR_Logo_Square.png',
     logoLarge:  true,
-    brandColor: { duo: ['#3e67a7', '#9d493f'] },
+    brandColor: { duo: ['#9d493f', '#3e67a7'] },
     variants: [
       {
         label:          'Web',
@@ -39,6 +39,14 @@ const PROJECTS = [
   },
 
   {
+    github: 'JoachimVN/Dart-Scores',
+    logo: 'resources/images/logos/Dart-Scores.png',
+    playUrl: '/dart-scores',
+    playText: 'View',
+    brandColor: { duo: ['#2e7d32', '#c62828'] },
+  },
+
+  {
     github: 'JoachimVN/Music-Popularity-Index',
     screenshotsDir: 'docs/screenshots',
     positions: ['left center', 'left center'],
@@ -46,10 +54,8 @@ const PROJECTS = [
     playUrl: '/mpi',
     playText: 'View',
     brandColor: '#21b151',
-
-
-    
   },
+
   {
     name:        'LEGO MINDSTORMS EV3',
     description: 'Two autonomous robots built at NTNU\'s IDATT1004 course. A competitive line follower and a waste sorting system programmed in Python.',

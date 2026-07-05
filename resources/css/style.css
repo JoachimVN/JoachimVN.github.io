@@ -558,7 +558,7 @@ a { text-decoration: none; }
   padding: 4px 12px;
   border-radius: 999px;
   border: 1px solid transparent;
-  color: rgba(var(--brand-color-rgb, 62,104,168), 0.75);
+  color: rgba(var(--brand-color-rgb, var(--brand-color-rgb, 62,104,168)), 0.75);
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -571,7 +571,7 @@ a { text-decoration: none; }
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--brand-gradient, var(--brand-color, #3e67a7));
+  background: var(--brand-gradient, var(--brand-color-2, var(--brand-color, #3e67a7)));
   transform: translateX(-105%);
   transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -584,7 +584,7 @@ a { text-decoration: none; }
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: var(--brand-gradient, var(--brand-color, #3e67a7));
+  background: var(--brand-gradient, var(--brand-color-2, var(--brand-color, #3e67a7)));
   opacity: 0.4;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -601,7 +601,7 @@ a { text-decoration: none; }
 .card-play-btn span {
   position: relative;
   z-index: 1;
-  background: var(--brand-gradient, var(--brand-color, currentColor));
+  background: var(--brand-gradient, var(--brand-color-2, var(--brand-color, currentColor)));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
