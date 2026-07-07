@@ -9,7 +9,8 @@ const PROJECTS = [
   {
     github:         'JoachimVN/Versed',
     screenshotsDir: 'docs/screenshots',
-    positions:      ['center', 'center', 'center'],
+    positions:      ['top center', 'top center', 'center', 'top center', 'top center'],
+    screenshotOrder: [2, 1, 5, 4, 3],
     playUrl:        '/versed/',
     logo:           'resources/images/logos/Versed_Logo.png',
     logoReveal:     true,
@@ -322,8 +323,15 @@ async function fetchScreenshots(slug, dir) {
 async function resolveScreenshots(entry) {
   if (!entry.screenshotsDir || !entry.github) return {};
   try {
-    const screenshots = await fetchScreenshots(entry.github, entry.screenshotsDir);
-    const positions = screenshots.map((_, i) => (entry.positions?.[i] ?? 'center'));
+    let screenshots = await fetchScreenshots(entry.github, entry.screenshotsDir);
+    let positions = screenshots.map((_, i) => (entry.positions?.[i] ?? 'center'));
+
+    if (entry.screenshotOrder) {
+      const order = entry.screenshotOrder.map(idx => idx - 1);
+      screenshots = order.map(i => screenshots[i]);
+      positions = order.map(i => positions[i]);
+    }
+
     return { screenshots, positions };
   } catch {
     return { screenshots: [], positions: [] };
