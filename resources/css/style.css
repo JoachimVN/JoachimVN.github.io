@@ -37,6 +37,17 @@ body {
 }
 
 a { text-decoration: none; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: rgba(201, 149, 42, 0.35);
+  color: var(--text);
+}
 .nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -1095,6 +1106,26 @@ a.card {
   pointer-events: none;
   border-radius: var(--radius);
   transition: background 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .fade-in-scroll {
+    opacity: 1;
+    transform: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
 }
 
 @media (max-width: 1200px) {

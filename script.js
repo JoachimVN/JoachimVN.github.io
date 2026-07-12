@@ -77,6 +77,8 @@ const PROJECTS = [
   },
 ];
 
+const REDUCED_MOTION = globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const LANG_COLORS = {
   JavaScript:  '#f1e05a',
   TypeScript:  '#2b7489',
@@ -142,13 +144,20 @@ function renderLogo(logo, logoClass, alt, reveal) {
 // across all dots (each dot reveals its own slice) instead of repeating in each pill.
 function dotButtonsHtml(screenshots) {
   return screenshots
-    .map((_, i) => `<button class="dot${i === 0 ? ' active' : ''}" data-index="${i}" style="--dot-i:${i}"></button>`)
+    .map((_, i) => `<button class="dot${i === 0 ? ' active' : ''}" data-index="${i}" style="--dot-i:${i}" aria-label="Screenshot ${i + 1}"></button>`)
     .join('');
 }
 
 function renderDots(screenshots) {
   if (screenshots.length <= 1) return '';
   return `<div class="card-dots" style="--dot-n:${screenshots.length}">${dotButtonsHtml(screenshots)}</div>`;
+}
+
+// a <span role="button"> rather than an <a> — cards themselves are anchors,
+// and nested anchors get broken apart by the HTML parser
+function playButtonHtml(url, label) {
+  const open = `event.preventDefault();event.stopPropagation();window.open('${url}','_blank')`;
+  return `<span class="card-play-btn" role="button" tabindex="0" onclick="${open}" onkeydown="if(event.key==='Enter'||event.key===' '){${open}}"><span>▶ ${label}</span></span>`;
 }
 
 function starSVG() {
@@ -164,12 +173,10 @@ function renderVariantCard({ variants, logo, logoLarge, brandColor }, index = 0)
   const logoClass = `card-logo${logoLarge ? ' card-logo--lg' : ''}`;
 
   const toggle = `<div class="card-toggle">
-    ${variants.map((va, i) => `<button class="card-toggle-btn${i === 0 ? ' active' : ''}" data-variant="${i}">${va.label}</button>`).join('')}
+    ${variants.map((va, i) => `<button class="card-toggle-btn${i === 0 ? ' active' : ''}" data-variant="${i}" aria-pressed="${i === 0}">${va.label}</button>`).join('')}
   </div>`;
 
-  const playLabel = v.playUrl
-    ? `<span class="card-play-btn" onclick="event.preventDefault();event.stopPropagation();window.open('${v.playUrl}','_blank')"><span>▶ Play</span></span>`
-    : '';
+  const playLabel = v.playUrl ? playButtonHtml(v.playUrl, 'Play') : '';
   const ctaLabel = v.url
     ? `<a class="card-link" href="${v.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">GitHub ↗</a>`
     : '';
@@ -215,9 +222,7 @@ function renderCard({ name, description, language, stars, url, pageUrl, playUrl,
   } else if (pageUrl) {
     ctaLabel = `<span class="card-link">View project ↗</span>`;
   }
-  const playLabel = playUrl
-    ? `<span class="card-play-btn" onclick="event.preventDefault();event.stopPropagation();window.open('${playUrl}','_blank')"><span>▶ ${playText || 'Play'}</span></span>`
-    : '';
+  const playLabel = playUrl ? playButtonHtml(playUrl, playText || 'Play') : '';
 
   const inner = `
     <div class="card-bg" style="background-image:url('${mainShot}');background-position:${mainPos}"></div>
@@ -276,33 +281,54 @@ function goToSlide(card, idx) {
   dots[idx]?.classList.add('active');
 }
 
+function stopSlideshow(card) {
+  const timer = cardSlideshows.get(card);
+  if (timer) clearInterval(timer);
+  cardSlideshows.set(card, null);
+}
+
 function startSlideshow(card) {
-  const prev = cardSlideshows.get(card);
-  if (prev) clearInterval(prev);
-
+  stopSlideshow(card);
+  if (REDUCED_MOTION) return;
   const screenshots = JSON.parse(card.dataset.screenshots || '[]');
-  if (screenshots.length <= 1) { cardSlideshows.set(card, null); return; }
+  if (screenshots.length <= 1) return;
 
-  let idx = 0;
-  const advance = () => { idx = (idx + 1) % screenshots.length; goToSlide(card, idx); };
-  let timer = setInterval(advance, SLIDE_DURATION);
+  const timer = setInterval(() => {
+    const shots = JSON.parse(card.dataset.screenshots || '[]');
+    const idx = (Number(card.dataset.slideIndex || 0) + 1) % shots.length;
+    card.dataset.slideIndex = idx;
+    goToSlide(card, idx);
+  }, SLIDE_DURATION);
   cardSlideshows.set(card, timer);
+}
 
+// bound once per set of rendered dots (re-run after a variant swap replaces them)
+function bindDots(card) {
   card.querySelectorAll('.dot').forEach((dot, i) => {
     dot.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
-      clearInterval(cardSlideshows.get(card));
-      idx = i;
-      goToSlide(card, idx);
-      timer = setInterval(advance, SLIDE_DURATION);
-      cardSlideshows.set(card, timer);
+      card.dataset.slideIndex = i;
+      goToSlide(card, i);
+      startSlideshow(card);
     });
   });
 }
 
+// slideshows only run while their card is in the viewport
 function initNavigation() {
-  document.querySelectorAll('.card').forEach(card => startSlideshow(card));
+  const cards = [...document.querySelectorAll('.card')];
+  cards.forEach(card => {
+    card.dataset.slideIndex = 0;
+    bindDots(card);
+  });
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(({ target, isIntersecting }) => {
+      if (isIntersecting) startSlideshow(target);
+      else stopSlideshow(target);
+    });
+  }, { threshold: 0.25 });
+  cards.forEach(card => obs.observe(card));
 }
 
 async function fetchScreenshots(slug, dir) {
@@ -403,6 +429,7 @@ function calcAge(year, month, day) {
 }
 
 function initParallax() {
+  if (REDUCED_MOTION) return;
   const photoWrap = document.querySelector('.hero-photo-wrap');
   if (!photoWrap) return;
 
@@ -634,10 +661,14 @@ function swapVariantContent(card, v) {
     if (!playEl) {
       playEl = document.createElement('span');
       playEl.className = 'card-play-btn';
+      playEl.setAttribute('role', 'button');
+      playEl.tabIndex = 0;
       playEl.innerHTML = '<span>▶ Play</span>';
       linkEl.before(playEl);
     }
-    playEl.onclick = e => { e.preventDefault(); e.stopPropagation(); window.open(v.playUrl, '_blank'); };
+    const openPlay = e => { e.preventDefault(); e.stopPropagation(); window.open(v.playUrl, '_blank'); };
+    playEl.onclick = openPlay;
+    playEl.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') openPlay(e); };
   } else {
     playEl?.remove();
   }
@@ -657,6 +688,8 @@ function swapVariantContent(card, v) {
     linkEl?.remove();
   }
 
+  card.dataset.slideIndex = 0;
+  bindDots(card);
   startSlideshow(card);
 }
 
@@ -785,10 +818,13 @@ function handleVariantClick(card, e) {
   card.dataset.screenshots   = JSON.stringify(v.screenshots);
   card.dataset.positions     = JSON.stringify(v.positions || []);
 
-  card.querySelectorAll('.card-toggle-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  card.querySelectorAll('.card-toggle-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+    b.setAttribute('aria-pressed', i === idx);
+  });
   updateToggleIndicator(card);
 
-  clearInterval(cardSlideshows.get(card));
+  stopSlideshow(card);
   commitVariantReveal(card);
 
   applyVariantSwap(card, v, idx > prevIdx);
@@ -807,6 +843,7 @@ function initVariantToggles() {
 function initTypewriter() {
   const el = document.querySelector('.hero-label');
   if (!el) return;
+  if (REDUCED_MOTION) { el.textContent = 'Developer & Student.'; return; }
   el.textContent = '';
   el.classList.add('typewriter-active');
 
@@ -856,6 +893,7 @@ function initScrollProgress() {
 }
 
 function initCardTilt() {
+  if (REDUCED_MOTION) return;
   document.querySelectorAll('.card').forEach(card => {
     const shine = card.querySelector('.card-shine');
 
