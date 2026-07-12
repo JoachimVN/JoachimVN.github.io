@@ -506,7 +506,7 @@ function initScrollFadeIn() {
       if (entry.isIntersecting) entry.target.classList.add('visible');
     });
   }, { threshold: 0.1 });
-  document.querySelectorAll('.about-section, .projects, .footer').forEach(el => {
+  document.querySelectorAll('.about-section, .projects, .footer, .lego-project, .lego-code').forEach(el => {
     el.classList.add('fade-in-scroll');
     observer.observe(el);
   });
@@ -882,6 +882,27 @@ function initTypewriter() {
   setTimeout(step, 900);
 }
 
+// highlights the nav link whose section currently occupies mid-viewport
+function initScrollSpy() {
+  const links = [...document.querySelectorAll('.nav-links a[href^="#"]')];
+  const byId  = new Map(
+    links
+      .map(a => [a.hash.slice(1), a])
+      .filter(([id]) => document.getElementById(id))
+  );
+  if (!byId.size) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const link = byId.get(e.target.id);
+      links.forEach(l => l.classList.toggle('active', l === link));
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+
+  byId.forEach((_, id) => obs.observe(document.getElementById(id)));
+}
+
 function initScrollProgress() {
   const bar = document.createElement('div');
   bar.className = 'scroll-progress';
@@ -991,6 +1012,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSectionReveal();
   initSkillsReveal();
   initTypewriter();
+  initScrollSpy();
   initScrollProgress();
   initCodeHighlight();
   initFooter();

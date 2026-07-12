@@ -78,6 +78,8 @@ a { text-decoration: none; }
 }
 
 .nav-links a {
+  position: relative;
+  padding: 0.35rem 0;
   font-size: 0.78rem;
   font-weight: 500;
   letter-spacing: 0.07em;
@@ -86,10 +88,28 @@ a { text-decoration: none; }
   transition: color 0.2s;
 }
 
+/* gold underline grows in from the left on hover / active section */
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: right 0.25s ease;
+}
+
 .nav-links a:hover { color: #fff; }
+
+.nav-links a:hover::after,
+.nav-links a.active::after { right: 0; }
+
+.nav-links a.active { color: var(--text); }
 .hero {
   position: relative;
   min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
@@ -191,6 +211,13 @@ a { text-decoration: none; }
   border-color: rgba(255, 255, 255, 0.38);
   transform: translateY(-2px);
 }
+
+.btn-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.btn:hover .btn-arrow { transform: translateY(3px); }
 
 .about-section {
   display: grid;
@@ -303,8 +330,9 @@ a { text-decoration: none; }
 .about-skills.skills-visible .skill:nth-child(11) { animation-delay: 0.85s; }
 .about-skills.skills-visible .skill:nth-child(12) { animation-delay: 0.93s; }
 
+/* each pill glows with its own language color (set via --skill-c inline) */
 .skill:hover {
-  border-color: rgba(201, 149, 42, 0.5);
+  border-color: color-mix(in srgb, var(--skill-c, var(--accent)) 65%, transparent);
   color: rgba(242, 239, 230, 0.9);
 }
 
@@ -324,6 +352,7 @@ a { text-decoration: none; }
   height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
+  background: var(--skill-c, var(--accent));
 }
 
 .projects {
@@ -514,7 +543,7 @@ a { text-decoration: none; }
 
 .card-desc {
   font-size: 0.78rem;
-  color: rgba(242, 239, 230, 0.55);
+  color: rgba(242, 239, 230, 0.65);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -700,9 +729,11 @@ a { text-decoration: none; }
 
 .footer-icons a {
   color: var(--muted);
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.2s ease;
   display: flex;
 }
+
+.footer-icons a:hover { transform: translateY(-2px); }
 
 .footer-icons a.icon-linkedin:hover           { color: #0A66C2; }
 .footer-icons a.icon-github:hover             { color: #f0f0f0; }
