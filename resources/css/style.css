@@ -1139,6 +1139,21 @@ a.card {
   transition: background 0.15s ease;
 }
 
+/* touch: bigger tap targets for carousel dots and variant toggles */
+@media (pointer: coarse) {
+  .card-dots {
+    gap: 0.45rem;
+    --dot-stride: calc(26px + 0.45rem);
+  }
+
+  .dot {
+    width: 26px;
+    height: 6px;
+  }
+
+  .card-toggle-btn { padding: 0.35rem 0.75rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 

@@ -430,6 +430,9 @@ function calcAge(year, month, day) {
 
 function initParallax() {
   if (REDUCED_MOTION) return;
+  // on mobile the photo sits in-flow above the text, so the scroll offset
+  // would drag it away from the layout instead of reading as depth
+  if (globalThis.matchMedia('(max-width: 768px)').matches) return;
   const photoWrap = document.querySelector('.hero-photo-wrap');
   if (!photoWrap) return;
 
@@ -915,6 +918,7 @@ function initScrollProgress() {
 
 function initCardTilt() {
   if (REDUCED_MOTION) return;
+  if (!globalThis.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   document.querySelectorAll('.card').forEach(card => {
     const shine = card.querySelector('.card-shine');
 
