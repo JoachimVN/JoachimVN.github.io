@@ -26,7 +26,7 @@
 | **Versed** | TypeScript · React | [repo](https://github.com/JoachimVN/Versed) · [play](https://joavn.dev/versed/) |
 | **CHORIDOR** (Web) | JavaScript · Socket.IO | [repo](https://github.com/JoachimVN/CHORIDOR-web) · [play](https://joavn.dev/choridor/) |
 | **CHORIDOR** (Desktop) | Java · JavaFX | [repo](https://github.com/JoachimVN/CHORIDOR) |
-| **Dart Scores** | TypeScript · React | [repo](https://github.com/JoachimVN/Dart-Scores) · [view](https://joavn.dev/dart-scores/) |
+| **Personal Dashboard** | TypeScript · React · Express | [repo](https://github.com/JoachimVN/Personal-Dashboard) |
 | **Music Popularity Index** | Python · JavaScript | [repo](https://github.com/JoachimVN/Music-Popularity-Index) · [view](https://joavn.dev/mpi/) |
 | **LEGO MINDSTORMS EV3** | Python | [page](https://joavn.dev/lego/) |
 

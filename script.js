@@ -40,13 +40,10 @@ const PROJECTS = [
   },
 
   {
-    github: 'JoachimVN/Dart-Scores',
-    logo: 'resources/images/logos/Dart-Scores.png',
-    playUrl: '/dart-scores',
-    playText: 'View',
+    github: 'JoachimVN/Personal-Dashboard',
+    logo: 'resources/images/logos/Personal-Dashboard.svg',
     screenshotsDir: 'docs/screenshots',
-    positions: ['center', 'right', 'top center'],
-    brandColor: { duo: ['#2e7d32', '#c62828'] },
+    brandColor: { gradient: ['#38bdf8', '#818cf8'] },
   },
 
   {
