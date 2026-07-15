@@ -44,6 +44,7 @@ const PROJECTS = [
     logo: 'resources/images/logos/Personal-Dashboard.svg',
     screenshotsDir: 'docs/screenshots',
     brandColor: { gradient: ['#38bdf8', '#818cf8'] },
+    positions: ['top center', 'center', 'top center', 'bottom center', 'top center']
   },
 
   {
