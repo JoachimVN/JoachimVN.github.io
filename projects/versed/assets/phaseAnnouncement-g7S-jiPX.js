@@ -1,1 +1,0 @@
-function r(e,n){switch(e){case"reveal":return n?.correct?"Round result: someone got it.":"Round result: no one got it.";case"leaderboard":return"Leaderboard updated.";case"finished":return"Final scores are in.";default:return null}}export{r as c};
