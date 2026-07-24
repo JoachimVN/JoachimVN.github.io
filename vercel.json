@@ -3,6 +3,8 @@
     "trailingSlash": true,
     "rewrites": [
         { "source": "/choridor/(.*)", "destination": "/projects/choridor/$1" },
+        { "source": "/dashboard/(.*\\..*)", "destination": "/projects/dashboard/$1" },
+        { "source": "/dashboard/(.*)", "destination": "/projects/dashboard/" },
         { "source": "/lego/(.*)", "destination": "/projects/lego/$1" },
         { "source": "/mpi/(.*)", "destination": "/projects/mpi/$1" },
         { "source": "/versed/(.*\\..*)", "destination": "/projects/versed/$1" },
