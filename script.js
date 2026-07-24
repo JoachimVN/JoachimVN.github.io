@@ -42,7 +42,7 @@ const PROJECTS = [
   {
     github: 'JoachimVN/Personal-Dashboard',
     logo: 'resources/images/logos/Personal-Dashboard.svg',
-    playUrl: 'https://joavn-dashboard-demo.vercel.app',
+    playUrl: '/dashboard/',
     playText: 'Demo',
     screenshotsDir: 'docs/screenshots',
     brandColor: { gradient: ['#38bdf8', '#818cf8'] },
