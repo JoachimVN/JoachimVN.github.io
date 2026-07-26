@@ -12,7 +12,7 @@ const PROJECTS = [
     positions:      ['top center', 'top center', 'center', 'top center', 'top center'],
     screenshotOrder: [2, 1, 5, 4, 3],
     playUrl:        '/versed/',
-    logo:           'projects/versed/logo.png',
+    logo:           'projects/versed/branding/logo.png',
     logoReveal:     true,
     brandColor:     { gradient: ['#00a6a3', '#9e12cc'] },
   },
