@@ -9,6 +9,9 @@ const STEP       = CELL_SIZE + GAP;
 const BOARD_TOTAL = BOARD_SIZE * CELL_SIZE + (BOARD_SIZE - 1) * GAP;
 const WALLS_PER_PLAYER = 10;
 
+// Toggle to hide the win-screen feedback box without ripping out the code.
+const WIN_FEEDBACK_ENABLED = false;
+
 const P1_COLOR       = '#9E4A40';
 const P2_COLOR       = '#3E68A8';
 const BG_COLOR       = '#0F1117';
@@ -2153,6 +2156,9 @@ document.getElementById('btn-copy-link').addEventListener('click', () => {
 // Win-screen feedback box. Shown after every game for now; the mode/result
 // context rides along so suggestions can be sliced by where they came from.
 function resetWinFeedback() {
+    document.getElementById('win-feedback')?.classList.toggle('hidden', !WIN_FEEDBACK_ENABLED);
+    if (!WIN_FEEDBACK_ENABLED) return;
+
     const input  = document.getElementById('win-feedback-input');
     const send   = document.getElementById('win-feedback-send');
     if (input) input.value = '';
