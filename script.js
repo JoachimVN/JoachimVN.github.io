@@ -1,12 +1,5 @@
 const PROJECTS = [
   {
-    github:         'JoachimVN/After-Hours',
-    screenshotsDir: 'src/main/resources/images/screenshots',
-    positions:      ['right top', 'center', 'left center'],
-    logo:           'resources/images/logos/After_Hours_Logo.png',
-    brandColor:     '#E7AB14',
-  },
-  {
     github:         'JoachimVN/Versed',
     screenshotsDir: 'docs/screenshots',
     positions:      ['top center', 'top center', 'center', 'top center', 'top center'],
@@ -47,6 +40,14 @@ const PROJECTS = [
     screenshotsDir: 'docs/screenshots',
     brandColor: { gradient: ['#38bdf8', '#818cf8'] },
     positions: ['top center', 'center', 'top center', 'bottom center', 'top center']
+  },
+
+  {
+    github:         'JoachimVN/After-Hours',
+    screenshotsDir: 'src/main/resources/images/screenshots',
+    positions:      ['right top', 'center', 'left center'],
+    logo:           'resources/images/logos/After_Hours_Logo.png',
+    brandColor:     '#E7AB14',
   },
 
   {
