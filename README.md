@@ -22,11 +22,11 @@
 
 | Project | Stack | Source |
 | --- | --- | --- |
-| **After Hours** | Java · JavaFX | [repo](https://github.com/JoachimVN/After-Hours) |
 | **Versed** | TypeScript · React | [repo](https://github.com/JoachimVN/Versed) · [play](https://joavn.dev/versed/) |
 | **CHORIDOR** (Web) | JavaScript · Socket.IO | [repo](https://github.com/JoachimVN/CHORIDOR-web) · [play](https://joavn.dev/choridor/) |
 | **CHORIDOR** (Desktop) | Java · JavaFX | [repo](https://github.com/JoachimVN/CHORIDOR) |
 | **Personal Dashboard** | TypeScript · React · Express | [repo](https://github.com/JoachimVN/Personal-Dashboard) |
+| **After Hours** | Java · JavaFX | [repo](https://github.com/JoachimVN/After-Hours) |
 | **Music Popularity Index** | Python · JavaScript | [repo](https://github.com/JoachimVN/Music-Popularity-Index) · [view](https://joavn.dev/mpi/) |
 | **LEGO MINDSTORMS EV3** | Python | [page](https://joavn.dev/lego/) |
 
@@ -48,7 +48,7 @@ npx serve .
 Opening `index.html` directly works for most features, but the LEGO page loads Python source files via `fetch()` so a local server is needed there.
 
 <details>
-<summary>File structure</summary>
+<summary>File structure (outdated)</summary>
 
 ```text
 index.html
