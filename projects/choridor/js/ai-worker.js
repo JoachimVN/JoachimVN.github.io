@@ -308,6 +308,9 @@ function decide(state) {
 }
 
 globalThis.onmessage = function(e) {
+    // Dedicated workers only ever receive messages from the same-origin script
+    // that created them, but Sonar flags any onmessage without an explicit check.
+    if (e.origin && e.origin !== self.location.origin) return;
     const { state, aiPlayer } = e.data;
     AI  = aiPlayer || 'p2';
     OPP = AI === 'p1' ? 'p2' : 'p1';
