@@ -1,18 +1,11 @@
 const PROJECTS = [
   {
-    github:         'JoachimVN/After-Hours',
-    screenshotsDir: 'src/main/resources/images/screenshots',
-    positions:      ['right top', 'center', 'left center'],
-    logo:           'resources/images/logos/After_Hours_Logo.png',
-    brandColor:     '#E7AB14',
-  },
-  {
     github:         'JoachimVN/Versed',
     screenshotsDir: 'docs/screenshots',
     positions:      ['top center', 'top center', 'center', 'top center', 'top center'],
     screenshotOrder: [2, 1, 5, 4, 3],
     playUrl:        '/versed/',
-    logo:           'projects/versed/logo.png',
+    logo:           'projects/versed/branding/logo.png',
     logoReveal:     true,
     brandColor:     { gradient: ['#00a6a3', '#9e12cc'] },
   },
@@ -40,13 +33,21 @@ const PROJECTS = [
   },
 
   {
-    github: 'JoachimVN/Dart-Scores',
-    logo: 'resources/images/logos/Dart-Scores.png',
-    playUrl: '/dart-scores',
-    playText: 'View',
+    github: 'JoachimVN/Personal-Dashboard',
+    logo: 'resources/images/logos/Personal-Dashboard.svg',
+    playUrl: '/dashboard/',
+    playText: 'Demo',
     screenshotsDir: 'docs/screenshots',
-    positions: ['center', 'right', 'top center'],
-    brandColor: { duo: ['#2e7d32', '#c62828'] },
+    brandColor: { gradient: ['#38bdf8', '#818cf8'] },
+    positions: ['top center', 'center', 'top center', 'bottom center', 'top center']
+  },
+
+  {
+    github:         'JoachimVN/After-Hours',
+    screenshotsDir: 'src/main/resources/images/screenshots',
+    positions:      ['right top', 'center', 'left center'],
+    logo:           'resources/images/logos/After_Hours_Logo.png',
+    brandColor:     '#E7AB14',
   },
 
   {
