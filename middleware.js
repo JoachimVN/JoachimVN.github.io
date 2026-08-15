@@ -11,8 +11,11 @@ export default function middleware(request) {
   const { pathname } = url;
 
   // Anything with a file extension is a static asset (css/js/img/font/etc.);
-  // only page routes (extensionless) should be case-normalized.
-  if (/\.[^/]+$/.test(pathname)) {
+  // only page routes (extensionless) should be case-normalized. Checked via
+  // string ops (not a regex) to avoid SonarCloud's backtracking warning.
+  const lastSegment = pathname.slice(pathname.lastIndexOf('/') + 1);
+  const dotIndex = lastSegment.lastIndexOf('.');
+  if (dotIndex !== -1 && dotIndex < lastSegment.length - 1) {
     return next();
   }
 
